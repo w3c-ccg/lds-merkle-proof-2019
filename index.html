@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Merkle Proof Signature Suite 2019</title>
+    <meta http-equiv='Content-Type' content='text/html;charset=utf-8'/>
+    <!--
+      === NOTA BENE ===
+      For the three scripts below, if your spec resides on dev.w3 you can check them
+      out in the same tree and use relative links so that they'll work offline,
+     -->
+    <script src='https://www.w3.org/Tools/respec/respec-w3c-common' class='remove'></script>
+    <script type="text/javascript" class="remove">
+      var respecConfig = {
+        // specification status (e.g. WD, LCWD, NOTE, etc.). If in doubt use ED.
+        specStatus:           "CG-DRAFT",
+
+        // the specification's short name, as in http://www.w3.org/TR/short-name/
+        shortName:            "lds-merkle-proof-2019",
+
+        // if you wish the publication date to be other than today, set this
+        // publishDate:  "2009-08-06",
+
+        // if there is a previously published draft, uncomment this and set its YYYY-MM-DD date
+        // and its maturity status
+        // previousPublishDate:  "1977-03-15",
+        // previousMaturity:  "WD",
+
+        // if there a publicly available Editor's Draft, this is the link
+        edDraftURI:           "https://w3c-dvcg.github.io/lds-merkle-proof-2019/",
+
+        // if this is a LCWD, uncomment and set the end of its review period
+        // lcEnd: "2009-08-05",
+
+        // if you want to have extra CSS, append them to this list
+        // it is recommended that the respec.css stylesheet be kept
+        //extraCSS:             ["spec.css", "prettify.css"],
+
+        // editors, add as many as you like
+        // only "name" is required
+        editors:  [
+          { name: "Kim Hamilton Duffy", url: "",
+            company: "Learning Machine", companyURL: "http://www.learningmachine.com/" },
+          { name: "Dmitry Semenovskiy", url: "",
+            company: "Vaultie Inc.", companyURL: "https://vaultie.io/" }
+        ],
+
+        // authors, add as many as you like.
+        // This is optional, uncomment if you have authors as well as editors.
+        // only "name" is required. Same format as editors.
+
+        authors:  [
+          { name: "Kim Hamilton Duffy", url: "",
+            company: "Learning Machine", companyURL: "http://www.learningmachine.com/" },
+          { name: "Dmitry Semenovskiy", url: "",
+            company: "Vaultie Inc.", companyURL: "https://vaultie.io/" }
+        ],
+
+        // extend the bibliography entries
+        //localBiblio: webpayments.localBiblio,
+
+        // name of the WG
+        wg:           "W3C Digital Verification Community Group",
+
+        // URI of the public WG page
+        wgURI:        "http://www.w3.org/community/digital-verification/",
+
+        // name (with the @w3c.org) of the public mailing to which comments are due
+        wgPublicList: "public-digital-verification",
+
+        otherLinks: [{
+          key: "Source control",
+          data: [{
+            value: "https://github.com/w3c-dvcg/lds-merkle-proof-2019/",
+            href: "https://github.com/w3c-dvcg/lds-merkle-proof-2019/"
+          }]
+        }, {
+          key: "Issue Tracker",
+          data: [{
+            value: "https://github.com/w3c-dvcg/lds-merkle-proof-2019/issues/",
+            href: "https://github.com/w3c-dvcg/lds-merkle-proof-2019/issues/"
+          }]
+        }],
+
+        // URI of the patent status for this WG, for Rec-track documents
+        // !!!! IMPORTANT !!!!
+        // This is important for Rec-track documents, do not copy a patent URI from a random
+        // document unless you know what you're doing. If in doubt ask your friendly neighbourhood
+        // Team Contact.
+        wgPatentURI:  "",
+        maxTocLevel: 4,
+        /*preProcess: [ webpayments.preProcess ],
+        alternateFormats: [ {uri: "diff-20111214.html", label: "diff to previous version"} ],
+        */
+        localBiblio:  {
+          "RDF-DATASET-CANONICALIZATION": {
+            title:    "RDF Dataset Canonicalization 1.0",
+            href:     "http://json-ld.github.io/normalization/spec/",
+            authors:  ["David Longley", "Manu Sporny"],
+            status:   "CGDRAFT",
+            publisher:  "JSON-LD Community Group"
+          },
+          "SECURITY-VOCABULARY": {
+            title:    "Security Linked Data Vocabulary",
+            href:     "https://web-payments.org/vocabs/security",
+            authors:  ["Manu Sporny","David Longley"],
+            status:   "CGDRAFT",
+            publisher:  "Web Payments Community Group"
+          },
+          "LD-PROOFS": {
+            title:    "Linked Data Proofs 1.0",
+            href:     "https://w3c-dvcg.github.io/ld-proofs/",
+            authors:  ["David Longley", "Manu Sporny"],
+            status:   "CGDRAFT",
+            publisher:  "W3C Digital Verification Community Group"
+          },
+          "LDS-ECDSA-SECP256K1-2019": {
+            title:    "Ecdsa Secp256k1 Signature 2019",
+            href:     "https://w3c-dvcg.github.io/lds-ecdsa-secp256k1-2019",
+            authors:  ["Orie Steele"],
+            status:   "CGDRAFT",
+            publisher:  "W3C Digital Verification Community Group"
+          },
+          "RFC7049": {
+            title: "Concise Binary Object Representation (CBOR)",
+            href: "https://tools.ietf.org/html/rfc7049",
+            publisher: "Internet Engineering Task Force (IETF)"
+          }
+        }
+      };
+    </script>
+  </head>
+  <body>
+    <section id='abstract'>
+      <p>
+This specification describes the Merkle Proof Signature Suite created in 2019 for the
+Linked Data Proofs specification.
+      </p>
+    </section>
+
+    <section id='sotd'>
+      <p>
+This is an experimental specification and is undergoing regular revisions. It
+is not fit for production deployment.
+      </p>
+    </section>
+
+    <section>
+      <h2>Introduction</h2>
+      <p>
+This specification describes the Merkle Proof Signature Suite created in 2019 for the
+Linked Data Proofs [[LD-PROOFS]] specification. It uses the RDF
+Dataset CANONICALIZATION Algorithm [[RDF-DATASET-CANONICALIZATION]] to transform the
+input document into its canonical form. It uses SHA-256 [[RFC6234]] as the
+<a>message digest algorithm</a> and ECDSA signature algorithm with a secp256k1 curve described in [[LDS-ECDSA-SECP256K1-2019]] 
+as the <a>proof algorithm</a>.
+      </p>
+    </section>
+
+    <section>
+      <h2>Terminology</h2>
+      <p>
+The following terms are used to describe concepts involved in the
+generation and verification of the Linked Data Proof 2019
+<a>proof suite</a>.
+      </p>
+
+      <dl>
+        <dt><dfn>proof suite</dfn></dt>
+        <dd>
+A specified set of cryptographic primitives typically consisting of a canonicalization algorithm, a message digest algorithm, and a proof algorithm that are bundled together by cryptographers for developers for the purposes of safety and convenience.
+        </dd>
+        <dt><dfn>canonicalization algorithm</dfn></dt>
+        <dd>
+An algorithm that takes an input document that has more than one possible
+representation and always transforms it into a canonical form. This process is
+sometimes also called CANONICALIZATION.
+        </dd>
+        <dt><dfn>message digest algorithm</dfn></dt>
+        <dd>
+An algorithm that takes an input message and produces a cryptographic
+output message that is often many orders of magnitude smaller than the
+input message. These algorithms are often 1) very fast, 2)
+non-reversible, 3) cause the output to change significantly when even one
+bit of the input message changes, and 4) make it infeasible to find two
+different inputs for the same output.
+        </dd>
+        <dt><dfn>proof algorithm</dfn></dt>
+        <dd>
+An algorithm that takes an input message and produces an output value where 
+the receiver of the message can mathematically verify that the message has 
+not been modified in transit and came from someone possessing a particular secret.
+        </dd>
+      </dl>
+
+    </section>
+
+    <section>
+      <h2>The 2019 Merkle Proof Signature Suite</h2>
+
+      <p>
+The 2019 Merkle Proof <a>proof suite</a> MUST be used in
+conjunction with the signing and verification algorithms in the
+Linked Data Proofs [[LD-PROOFS]] specification. The suite consists of
+the following algorithms:
+      </p>
+
+      <table class="simple">
+        <thead>
+          <th>Parameter</th>
+          <th>Value</th>
+          <th>Specification</th>
+        </thead>
+        <tbody>
+          <tr>
+            <td>canonicalizationAlgorithm</td>
+            <td>https://w3id.org/security#GCA2015</td>
+            <td>[[RDF-DATASET-CANONICALIZATION]]</td>
+          </tr>
+          <tr>
+            <td>digestAlgorithm</td>
+            <td>https://tools.ietf.org/html/rfc6234</td>
+            <td>[[RFC6234]]</td>
+          </tr>
+          <tr>
+            <td>signatureAlgorithm</td>
+            <td>https://w3c-dvcg.github.io/lds-ecdsa-secp256k1-2019</td>
+            <td>[[LDS-ECDSA-SECP256K1-2019]]</td>
+          </tr>
+        </tbody>
+
+      </table>
+
+    <section>
+      <h2>Modification to Algorithms</h2>
+
+      <p>
+This signature suite uses the root hash of the Merkle Tree defined in [[RFC6962]] and [[LDS-ECDSA-SECP256K1-2019]]. The signature algorithm uses 
+the Merkle Tree root hash, stored in the input data of a Bitcoin or Ethereum transaction with ECDSA signature.
+      <p>
+
+      <section>
+        <h3>Modifications to Signature Algorithm</h3>
+
+        <p>
+The <var>digital signature algorithm</var> defined in Section 7.1:
+Signature Algorithm takes an array of <var>tbs</var>, a <var>privateKey</var>,
+and </var><var>options</var> as inputs and produces a
+<var>proofValue</var> as an output.
+        </p>
+        <ol class="algorithm">
+          <li>
+Take an array of <var>tbs</var>, which is an array of the data to be signed, as input and generate
+a Merkle Tree.
+          </li>
+          <li>
+Include the root of the Merkle Tree ("Merkle Root") in the data field of the Blockchain (Bitcoint or Ethereum) transaction. 
+For Bitcoin this is the OP_RETURN field. For Ethereum this is <code>data</code> field of the transaction.
+          </li>
+          <li>
+Sign the transaction with encoding of <var>privateKey</var> appropriate for the blockchain. For Bitcoin this is
+a WIF encoding. Per the signature suite definition, this is using [[LDS-ECDSA-SECP256K1-2019]].
+          </li>
+          <li>
+For each <var>tbs</var>, create the proof object, which includes:
+            <ul>
+              <li>
+The hash of the element as <code>targetHash</code>
+              </li>
+              <li>
+The merkle root as <code>merkleRoot</code>
+              </li>
+              <li>
+The Merkle Proof for <var>tbs</var>, which is the path from <code>targetHash</code> to <code>merkleRoot</code> in the
+Merkle Tree, as <code>proof</code>. The should not include the endpoints of the path (<code>targetHash</code> and
+<code>merkleRoot</code>)
+              </li>
+              <li>
+The blockchain anchor(s) as <em>anchors</em>. This describes how to look up the blockchain transaction. Its fields
+include the blockchain, the network, the transaction hash and optionally the block as <code>blink</code> (Blockchain Links specification).
+The URL format of a Blockchain Link is the following:
+<code>blink:<BLOCKCHAIN>:<NETWORK>:<TRANSACTION>[:<BLOCK>]</code>
+              </li>
+            </ul>
+          <li>
+Encode resulting object using Concise Binary Object Representation (CBOR) [[RFC7049]] according to the algorithm described below.
+Encode resulting array buffer using multi-base <code>base58btc</code> encoding and 
+return the result string as <em>proofValue</em>.
+          </li>
+        </ol>
+      </section>
+      
+      <section>
+        <h3>Compressing and encoding proofValue using CBOR</h3>
+
+        <p>
+          The <var>proofValue</var> object descrined in the previous step must be encoded using CBOR before encoding the result using <code>base58btc</code>.
+
+          <ol class="algorithm">
+            <li>
+              Convert JSON proofValue into a map. The keys must be replaced with the corresponding numeric IDs from the keymap:
+              <ul>
+                <li><code>merkleRoot</code>: 0</li>
+                <li><code>targetHash</code>: 1</li>
+                <li>
+                  <code>anchors</code>: 2
+                  <ul>
+                    <li><code>BLOCKCHAIN</code>: 0</li>
+                    <li><code>NETWORK</code>: 1</li>
+                    <li><code>TRANSACTION</code>: 2</li>
+                    <li><code>BlOCK</code>: 3 (optional)</li>
+                  </ul>
+                </li>
+                <li>
+                  <code>path</code>: 3
+                  <ul>
+                    <li><code>left</code>: 0</li>
+                    <li><code>right</code>: 1</li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>Every hexadecimal string value must be encoded using CBOR Major Type 2.</li>
+            <li>Constant string values, such as a blockchain name or a network must be substituted using the corresponding numeric key from the blockchain keymap below.</li>
+          </ol>
+        </p>
+      </section>
+
+      <section>
+        <h3>Blockchain keymap</h3>
+        <ul>
+          <li>
+            <code>btc</code>: 0
+            <ul>
+              <li><code>mainnet</code>: 1</li>
+              <li><code>testnet</code>: 3</li>
+            </ul>
+          </li>
+          <li>
+            <code>eth</code>: 1
+            <ul>
+              <li><code>mainnet</code>: 1</li>
+              <li><code>ropsten</code>: 3</li>
+              <li><code>rinkeby</code>: 4</li>
+            </ul>
+          </li>
+        </ul>
+        <div class="issue">Add more blockchains and networks.</div>
+      </section>  
+
+    <section>
+        <h3>Modifications to Signature Verification Algorithm</h3>
+
+        <p>
+          Prior to verifying the signature, proofValue object must be reconstructed from CBOR / multo-base encoded string.
+        </p>
+        <p>
+          In order to do that, a reverse algorithm to <a href='#compressing-and-encoding-proofvalue-using-cbor'>Compressing and encoding proofValue using CBOR</a> must be applied.
+        </p>
+        <p>
+The <var>digital signature algorithm</var> defined in Section 7.2:
+Signature Verification Algorithm takes the value to be verified,
+a <em>tbv</em>, the <em>public key</em> to the signature algorithm
+and returns a boolean value.
+        </p>
+        <ol class="algorithm">
+          <li>
+Validate the values <code>targetHash</code>, <code>path</code>, and <code>merkleRoot</code> form a valid Merkle Path.
+          </li>
+          <li>
+Verify that <code>targetHash</code> matches the JSON-LD canonicalized, SHA256 Hash of <var>tbv</var>.
+          </li>
+          <li>
+Verify <code>merkleRoot</code> matches what is stored in the transaction at <em>blink</em> URL (Blockchain Link).
+          </li>
+          <li>
+If all of the above checks pass, return <code>true</code>, otherwise return <code>false</code>.
+          </li>
+        </ol>
+    </section>
+
+    </section>
+
+    <section>
+      <h2>Security Considerations</h2>
+      <p>
+The following section describes security considerations that developers
+implementing this specification should be aware of in order to create secure
+software.
+      </p>
+
+<div class="issue">TODO: We need to add a complete list of security
+considerations.</div>
+    </section>
+
+
+    <section class="appendix">
+      <h2>Examples</h2>
+
+      <p>
+        A simple example of a decoded proofValue:
+      </p>
+        
+      <pre class="example highlight">
+        "proofValue": {
+          "path": [
+            { "right": "51b4e22ed024ec7f38dc68b0bf78c87eda525ab0896b75d2064bdb9fc60b2698" },
+            { "right": "61c56cca660b2e616d0bd62775e728f50275ae44adf12d1bfb9b9c507a14766b" }
+          ],
+          "merkleRoot": "3c9ee831b8705f2fbe09f8b3a92247eed88cdc90418c024924be668fdc92e781", 
+          "targetHash": "c65c6184e3d5a945ddb5437e93ea312411fd33aa1def22b0746d6ecd4aa30f20",
+          "anchors": [
+            "blink:btc:testnet:582733d7cef8035d87cecc9ebbe13b3a2f6cc52583fbcd2b9709f20a6b8b56b3"
+          ]
+        }
+      </pre>
+      
+      <p>
+        An example of CDDL for CBOR-encoded proofValue:
+      </p>
+
+      <pre class="example highlight">
+        84                                     # array(4)
+          82                                   # array(2)
+             03                                # unsigned(3)
+             82                                # array(2)
+                82                             # array(2)
+                   01                          # unsigned(1)
+                   58 22                       # bytes(34)
+                      582051B4E22ED024EC7F38DC68B0BF78C87EDA525AB0896B75D2064BDB9FC60B2698 # "X Q\xB4\xE2.\xD0$\xEC\x7F8\xDCh\xB0\xBFx\xC8~\xDARZ\xB0\x89ku\xD2\x06K\xDB\x9F\xC6\v&\x98"
+                82                             # array(2)
+                   01                          # unsigned(1)
+                   58 22                       # bytes(34)
+                      582061C56CCA660B2E616D0BD62775E728F50275AE44ADF12D1BFB9B9C507A14766B # "X a\xC5l\xCAf\v.am\v\xD6'u\xE7(\xF5\x02u\xAED\xAD\xF1-\e\xFB\x9B\x9CPz\x14vk"
+          82                                   # array(2)
+             00                                # unsigned(0)
+             58 22                             # bytes(34)
+                58203C9EE831B8705F2FBE09F8B3A92247EED88CDC90418C024924BE668FDC92E781 # "X <\x9E\xE81\xB8p_/\xBE\t\xF8\xB3\xA9\"G\xEE\xD8\x8C\xDC\x90A\x8C\x02I$\xBEf\x8F\xDC\x92\xE7\x81"
+          82                                   # array(2)
+             01                                # unsigned(1)
+             58 22                             # bytes(34)
+                5820C65C6184E3D5A945DDB5437E93EA312411FD33AA1DEF22B0746D6ECD4AA30F20 # "X \xC6\\a\x84\xE3\xD5\xA9E\xDD\xB5C~\x93\xEA1$\x11\xFD3\xAA\x1D\xEF\"\xB0tmn\xCDJ\xA3\x0F "
+          82                                   # array(2)
+             02                                # unsigned(2)
+             81                                # array(1)
+                83                             # array(3)
+                   82                          # array(2)
+                      00                       # unsigned(0)
+                      00                       # unsigned(0)
+                   82                          # array(2)
+                      01                       # unsigned(1)
+                      03                       # unsigned(3)
+                   82                          # array(2)
+                      02                       # unsigned(2)
+                      58 22                    # bytes(34)
+                         5820582733D7CEF8035D87CECC9EBBE13B3A2F6CC52583FBCD2B9709F20A6B8B56B3 # "X X'3\xD7\xCE\xF8\x03]\x87\xCE\xCC\x9E\xBB\xE1;:/l\xC5%\x83\xFB\xCD+\x97\t\xF2\nk\x8BV\xB3"       
+      </pre>
+
+      <p>
+A simple example of a Merkle Proof Signature Suite 2019 signature (proofValue encoded):
+      </p>
+
+      <pre class="example highlight">
+      "proof": {
+        "@context": ["https://w3id.org/security/v2"],
+        "type": "MerkleProof2019",
+        "creator": "did:example:abcdefghij0123456789",
+        "created": "2019-10-16T20:21:34Z",
+        "domain": "example.org",
+        "nonce": "2bbgh3dgjg2302d-d2b3gi423d42",
+        "proofValue": "z6nGv6rMRybRe9CuMzbQbdu7sA858v1d13JU3hoAr1x93cheinB35kDXqCvaA93WTLWGtLZMdQSvvNCxEMZPhLvDa4CbUYkm4pCwBe7kCZAsuwHZwHxgyzCbRUWFbMXHhkVSHoPYmPzfi4arfHKMgKSurZ7oqe3GHRdi78TbHGvA65edK8JBEdTUt8SpCdc7wz5qiwj3THtcNAXfgK4LmCAu4fq8CnjLcMtGoEdfXfjy3turtaTapyM3katuYKAzbJF3FiE8i8NXBsiBnEbvKk7k"
+      }
+      </pre>
+    </section>
+
+  </body>
+</html>

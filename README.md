@@ -1,1 +1,1 @@
-# lds-merkleproof-2019
+# lds-merkle-proof-2019
